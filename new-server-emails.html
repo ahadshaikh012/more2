@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duplicate Remover Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #06d6a0;
+            --danger: #ef476f;
+            --warning: #ffd166;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 16px;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+
+        .app-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .tab-container {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 5px;
+            margin: 20px auto 0;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 20px;
+            text-align: center;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            height: fit-content;
+        }
+
+        .card-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            background-color: var(--light);
+        }
+
+        .card-header i {
+            margin-right: 10px;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            resize: none;
+            font-size: 1rem;
+            transition: all 0.3s;
+            line-height: 1.5;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .result-container {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .result-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .result-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .result-container::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .email-item, .number-item {
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .email-item {
+            border-left: 4px solid var(--primary);
+        }
+
+        .number-item {
+            border-left: 4px solid var(--success);
+        }
+
+        .email-item:last-child, .number-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .email-item i {
+            margin-right: 12px;
+            color: var(--primary);
+        }
+
+        .number-item i {
+            margin-right: 12px;
+            color: var(--success);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--light);
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .original .stat-value {
+            color: var(--danger);
+        }
+
+        .unique .stat-value {
+            color: var(--success);
+        }
+
+        .removed .stat-value {
+            color: var(--gray);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--success);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+            animation: slideUp 0.3s ease;
+            font-weight: 600;
+        }
+
+        @keyframes slideUp {
+            from { bottom: -50px; opacity: 0; }
+            to { bottom: 20px; opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+            background-color: var(--light);
+        }
+
+        .features {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            margin: 5px 10px;
+            font-size: 0.9rem;
+        }
+
+        .feature i {
+            margin-right: 5px;
+            color: var(--success);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="app-icon">
+                <i class="fas fa-filter"></i>
+            </div>
+            <h1>Duplicate Remover Pro</h1>
+            <p>Professional tool to clean your email and phone number lists by removing duplicates</p>
+            
+            <div class="tab-container">
+                <div class="tab active" data-tab="email">
+                    <i class="fas fa-envelope"></i> Emails
+                </div>
+                <div class="tab" data-tab="phone">
+                    <i class="fas fa-phone"></i> Phone Numbers
+                </div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- Email Tab Content -->
+            <div class="tab-content active" id="email-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-edit"></i>
+                        <h2>Input Emails</h2>
+                    </div>
+                    <div class="card-body">
+                        <textarea id="emailInput" placeholder="Enter emails (one per line or comma-separated)">test@example.com
+user1@gmail.com
+test@example.com
+user2@yahoo.com
+user1@gmail.com
+admin@company.com
+developer@tech.org
+user2@yahoo.com
+support@company.com
+test@example.com</textarea>
+                        <div class="buttons">
+                            <button class="btn-primary" onclick="removeDuplicates('email')">
+                                <i class="fas fa-filter"></i> Remove Duplicates
+                            </button>
+                            <button class="btn-secondary" onclick="clearAll('email')">
+                                <i class="fas fa-broom"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-check-circle"></i>
+                        <h2>Unique Emails</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="result-container" id="emailResultBox">
+                            <!-- Email results will appear here -->
+                        </div>
+                        
+                        <div class="stats">
+                            <div class="stat-item original">
+                                <div class="stat-value" id="emailOriginalCount">0</div>
+                                <div class="stat-label">Original</div>
+                            </div>
+                            <div class="stat-item unique">
+                                <div class="stat-value" id="emailUniqueCount">0</div>
+                                <div class="stat-label">Unique</div>
+                            </div>
+                            <div class="stat-item removed">
+                                <div class="stat-value" id="emailRemovedCount">0</div>
+                                <div class="stat-label">Removed</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Phone Tab Content -->
+            <div class="tab-content" id="phone-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-edit"></i>
+                        <h2>Input Phone Numbers</h2>
+                    </div>
+                    <div class="card-body">
+                        <textarea id="phoneInput" placeholder="Enter phone numbers (one per line or comma-separated)">+1-555-123-4567
+(555) 987-6543
+555.123.4567
++1-555-123-4567
+5559876543
+(555) 123-4567
+555.987.6543
++1-555-987-6543
+5551234567
+(555) 987-6543</textarea>
+                        <div class="buttons">
+                            <button class="btn-primary" onclick="removeDuplicates('phone')">
+                                <i class="fas fa-filter"></i> Remove Duplicates
+                            </button>
+                            <button class="btn-secondary" onclick="clearAll('phone')">
+                                <i class="fas fa-broom"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-check-circle"></i>
+                        <h2>Unique Phone Numbers</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="result-container" id="phoneResultBox">
+                            <!-- Phone results will appear here -->
+                        </div>
+                        
+                        <div class="stats">
+                            <div class="stat-item original">
+                                <div class="stat-value" id="phoneOriginalCount">0</div>
+                                <div class="stat-label">Original</div>
+                            </div>
+                            <div class="stat-item unique">
+                                <div class="stat-value" id="phoneUniqueCount">0</div>
+                                <div class="stat-label">Unique</div>
+                            </div>
+                            <div class="stat-item removed">
+                                <div class="stat-value" id="phoneRemovedCount">0</div>
+                                <div class="stat-label">Removed</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Duplicate Remover Pro &copy; 2023 | Professional Data Cleaning Tool</p>
+            <div class="features">
+                <div class="feature"><i class="fas fa-check"></i> Emails & Phone Numbers</div>
+                <div class="feature"><i class="fas fa-check"></i> Preserves Order</div>
+                <div class="feature"><i class="fas fa-check"></i> Fast Processing</div>
+                <div class="feature"><i class="fas fa-check"></i> Mobile Friendly</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">Duplicates removed successfully!</div>
+
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+            });
+        });
+
+        // Function to normalize phone numbers
+        function normalizePhoneNumber(phone) {
+            // Remove all non-digit characters except leading +
+            return phone.replace(/(?!^\+)\D/g, '');
+        }
+
+        // Function to remove duplicates from email or phone list
+        function removeDuplicates(type) {
+            const input = document.getElementById(`${type}Input`).value;
+            const resultBox = document.getElementById(`${type}ResultBox`);
+            const originalCount = document.getElementById(`${type}OriginalCount`);
+            const uniqueCount = document.getElementById(`${type}UniqueCount`);
+            const removedCount = document.getElementById(`${type}RemovedCount`);
+            const notification = document.getElementById('notification');
+            
+            // Parse items from input (support both new lines and commas)
+            let items = input.split(/[\n,]+/).map(item => item.trim()).filter(item => item);
+            
+            let uniqueItems;
+            
+            if (type === 'email') {
+                // For emails, use direct comparison
+                uniqueItems = [...new Set(items)];
+            } else {
+                // For phones, normalize first then remove duplicates while preserving order
+                const normalizedItems = items.map(item => normalizePhoneNumber(item));
+                const seen = new Set();
+                uniqueItems = [];
+                
+                for (let i = 0; i < items.length; i++) {
+                    const normalized = normalizedItems[i];
+                    if (!seen.has(normalized)) {
+                        seen.add(normalized);
+                        uniqueItems.push(items[i]);
+                    }
+                }
+            }
+            
+            // Update counts
+            originalCount.textContent = items.length;
+            uniqueCount.textContent = uniqueItems.length;
+            removedCount.textContent = items.length - uniqueItems.length;
+            
+            // Clear result box
+            resultBox.innerHTML = '';
+            
+            // Display unique items
+            uniqueItems.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = type === 'email' ? 'email-item' : 'number-item';
+                itemElement.innerHTML = `<i class="fas ${type === 'email' ? 'fa-envelope' : 'fa-phone'}"></i> ${item}`;
+                resultBox.appendChild(itemElement);
+            });
+            
+            // Show notification
+            notification.textContent = `Removed ${items.length - uniqueItems.length} duplicate(s) from ${type} list!`;
+            notification.style.display = 'block';
+            
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Function to clear all inputs and results
+        function clearAll(type) {
+            document.getElementById(`${type}Input`).value = '';
+            document.getElementById(`${type}ResultBox`).innerHTML = '';
+            document.getElementById(`${type}OriginalCount`).textContent = '0';
+            document.getElementById(`${type}UniqueCount`).textContent = '0';
+            document.getElementById(`${type}RemovedCount`).textContent = '0';
+        }
+        
+        // Initialize with sample data
+        window.onload = function() {
+            removeDuplicates('email');
+            removeDuplicates('phone');
+        };
+    </script>
+</body>
+</html>
